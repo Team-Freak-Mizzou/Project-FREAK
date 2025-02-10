@@ -1,0 +1,32 @@
+﻿<Window x:Class="Project_FREAK.Views.Settings.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Project_FREAK.Views.Settings"
+        mc:Ignorable="d"
+        Title="Settings" Height="450" Width="800"
+        Background="#1E1E1E">
+    <Grid>
+        <!-- Define two columns: left for selection, right for display -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="125"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left panel: a bordered StackPanel containing a ListBox -->
+        <Border Grid.Column="0" Background="#2D2D30">
+            <StackPanel>
+                <ListBox Name="SettingsList" SelectionChanged="SettingsList_SelectionChanged"
+                         Background="#2D2D30" Foreground="White" BorderThickness="0">
+                    <ListBoxItem Content="General" Background="#2D2D30" Foreground="White"/>
+                    <ListBoxItem Content="Input" Background="#2D2D30" Foreground="White"/>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <!-- Right panel: a Frame to display the selected settings page -->
+        <Frame Grid.Column="1" Name="SettingsFrame" NavigationUIVisibility="Hidden"
+               Background="#1E1E1E"/>
+    </Grid>
+</Window>

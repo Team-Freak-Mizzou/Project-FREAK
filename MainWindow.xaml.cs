@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Project_FREAK.Views;  // Imports Views namespace and allows us to change the page displayed in the MainFrame.
+using Project_FREAK.Views.Settings;  // Imports Settings namespace and allows us to change the page displayed in the SettingsFrame.
 
 namespace Project_FREAK
 {
@@ -22,8 +23,9 @@ namespace Project_FREAK
 
         private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement settings page
-            MessageBox.Show("Settings selected");
+            var settingsWindow = new SettingsWindow();  // Create a new instance of the SettingsWindow
+            settingsWindow.Owner = this;    // Set the owner of the SettingsWindow to be the MainWindow
+            settingsWindow.Show();
         }
 
         private void HomeMenuItem_Click(object sender, RoutedEventArgs e)

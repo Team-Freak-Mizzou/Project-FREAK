@@ -1,0 +1,52 @@
+﻿<Page x:Class="Project_FREAK.Views.Settings.GeneralSettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="General Settings"
+      Background="#1E1E1E">
+
+    <Grid Margin="20">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top">
+            <!-- Page Header -->
+            <TextBlock Text="General Settings" 
+                       Foreground="White" 
+                       FontSize="24" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,20"/>
+
+            <!-- Placeholder Setting: Enable Notifications -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Example Setting 1:" 
+                           Foreground="White" 
+                           Width="200" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="True" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Placeholder Setting: Start with Windows -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Example Setting 2:" 
+                           Foreground="White" 
+                           Width="200" VerticalAlignment="Center"/>
+                <CheckBox VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Placeholder Setting: Auto-Update -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Example Setting 3:" 
+                           Foreground="White" 
+                           Width="200" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="True" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Placeholder Setting: Theme Selection -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Example Setting 4:" 
+                           Foreground="White" 
+                           Width="200" VerticalAlignment="Center"/>
+                <ComboBox Width="150" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Option 1" IsSelected="True"/>
+                    <ComboBoxItem Content="Option 2"/>
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>
