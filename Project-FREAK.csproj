@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Reference Include="LabJack.LJM">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\LabJack\Drivers\LabJack.LJM.dll</HintPath>
+      <HintPath>F:\Program Files\LabJack\Drivers\LabJack.LJM.dll</HintPath>
     </Reference>
   </ItemGroup>
 
