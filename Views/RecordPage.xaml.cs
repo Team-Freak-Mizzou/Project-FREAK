@@ -17,6 +17,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using ScottPlot;
+using ScottPlot.WPF;
+using ScottPlot.Plottables;
+
+
 
 namespace Project_FREAK.Views
 {
@@ -30,7 +35,7 @@ namespace Project_FREAK.Views
         // Importing the DeleteObject function from the gdi32.dll to release GDI objects (like HBITMAPs) in unmanaged code.
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
-
+        private DateTime startTime = DateTime.Now;
         public RecordPage()
         {
             InitializeComponent();
@@ -43,10 +48,32 @@ namespace Project_FREAK.Views
         //thrust in N, pressure in PSI
         private void UpdateGraphs(double thrustVoltage, double calibratedThrust, double pressureVoltage, double calibratedPressure)
         {
-            //on an update, invoke ui thread to update with correct values. This will be replaced later with graphs of data.
-            Dispatcher.Invoke(() => {
-                Graph1.Text = $"Thrust: {calibratedThrust:F2} N";
-                Graph2.Text = $"Pressure: {pressureVoltage:F2} PSI";
+            // Calculate elapsed time in seconds
+            double elapsedTime = (DateTime.Now - startTime).TotalSeconds;
+
+            Dispatcher.Invoke(() =>
+            {
+                // Update Thrust Graph
+                ThrustGraph.Plot.Clear();
+                var thrustSignal = ThrustGraph.Plot.Add.Scatter(new double[] { elapsedTime }, new double[] { calibratedThrust });
+                ThrustGraph.Plot.Axes.Bottom.Label.Text = "Time (s)";
+                ThrustGraph.Plot.Axes.Left.Label.Text = "Thrust (N)";
+                ThrustGraph.Plot.Title("Thrust Over Time");
+
+                // Ensure proper scaling for X-axis (time in seconds)
+                ThrustGraph.Plot.Axes.SetLimitsX(0, elapsedTime + 1); // Scale X-axis to show elapsed time range
+                ThrustGraph.Refresh();
+
+                // Update Pressure Graph
+                PressureGraph.Plot.Clear();
+                var pressureSignal = PressureGraph.Plot.Add.Scatter(new double[] { elapsedTime }, new double[] { calibratedPressure });
+                PressureGraph.Plot.Axes.Bottom.Label.Text = "Time (s)";
+                PressureGraph.Plot.Axes.Left.Label.Text = "Pressure (PSI)";
+                PressureGraph.Plot.Title("Pressure Over Time");
+
+                // Ensure proper scaling for X-axis (time in seconds)
+                PressureGraph.Plot.Axes.SetLimitsX(0, elapsedTime + 1); // Scale X-axis to show elapsed time range
+                PressureGraph.Refresh();
             });
         }
         // Load the webcam input on a background thread and start the loading text animation.

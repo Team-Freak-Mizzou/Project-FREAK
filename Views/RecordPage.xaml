@@ -1,6 +1,7 @@
 ﻿<Page x:Class="Project_FREAK.Views.RecordPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:scottplot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
       Background="#1E1E1E">
 
     <Grid Margin="5">
@@ -27,11 +28,8 @@
                     Margin="2"
                     HorizontalAlignment="Stretch" 
                     VerticalAlignment="Stretch">
-                <TextBlock x:Name="Graph1" Text="Graph 1 Placeholder" 
-                           Foreground="White" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"
-                           FontSize="16"/>
+                <scottplot:WpfPlot x:Name="ThrustGraph" />
+
             </Border>
 
             <Border Grid.Row="1" 
@@ -40,11 +38,7 @@
                     Margin="2"
                     HorizontalAlignment="Stretch" 
                     VerticalAlignment="Stretch">
-                <TextBlock x:Name="Graph2" Text="Graph 2 Placeholder" 
-                           Foreground="White" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"
-                           FontSize="16"/>
+                <scottplot:WpfPlot x:Name="PressureGraph"/>
             </Border>
         </Grid>
 
@@ -57,9 +51,7 @@
         HorizontalAlignment="Stretch" 
         VerticalAlignment="Stretch">
             <Grid>
-                <!-- The webcam feed will be loaded into this Image -->
                 <Image x:Name="WebcamImage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                <!-- This TextBlock overlays the Image until the webcam feed is ready -->
                 <TextBlock x:Name="LoadingTextBlock"
                    Text="Loading."
                    Foreground="White"
@@ -69,7 +61,6 @@
                    Background="Transparent"/>
             </Grid>
         </Border>
-
 
         <!-- Right Side: Control Panel -->
         <Border Grid.Column="1" 
@@ -106,14 +97,11 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Buttons with scaling text -->
                     <Button Grid.Row="0" Grid.Column="0" 
                             Background="Green" 
                             Margin="1"
                             HorizontalAlignment="Stretch" 
-                            VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            VerticalContentAlignment="Stretch">
+                            VerticalAlignment="Stretch">
                         <Viewbox Stretch="Uniform">
                             <TextBlock Text="Start" Foreground="White" Margin="2"/>
                         </Viewbox>
@@ -123,9 +111,7 @@
                             Background="Orange" 
                             Margin="1"
                             HorizontalAlignment="Stretch" 
-                            VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            VerticalContentAlignment="Stretch">
+                            VerticalAlignment="Stretch">
                         <Viewbox Stretch="Uniform">
                             <TextBlock Text="Arm" Foreground="White" Margin="2"/>
                         </Viewbox>
@@ -136,10 +122,7 @@
                             Margin="1"
                             HorizontalAlignment="Stretch" 
                             VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            VerticalContentAlignment="Stretch"
                             Click="SensorCheckButton_Click">
-                            
                         <Viewbox Stretch="Uniform">
                             <TextBlock Text="Sensor Check" Foreground="White" Margin="2"/>
                         </Viewbox>
@@ -149,9 +132,7 @@
                             Background="Red" 
                             Margin="1"
                             HorizontalAlignment="Stretch" 
-                            VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            VerticalContentAlignment="Stretch">
+                            VerticalAlignment="Stretch">
                         <Viewbox Stretch="Uniform">
                             <TextBlock Text="Save" Foreground="White" Margin="2"/>
                         </Viewbox>

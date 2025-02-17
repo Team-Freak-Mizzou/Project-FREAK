@@ -14,12 +14,15 @@
     <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
 	<PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
 	<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
+	<PackageReference Include="ScottPlot" Version="5.0.54" />
+	<PackageReference Include="ScottPlot.WPF" Version="5.0.54" />
+	<PackageReference Include="SkiaSharp" Version="3.116.1" />
 	<PackageReference Include="System.Drawing.Common" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="LabJack.LJM">
-      <HintPath>F:\Program Files\LabJack\Drivers\LabJack.LJM.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\LabJack\Drivers\LabJack.LJM.dll</HintPath>
     </Reference>
   </ItemGroup>
 
