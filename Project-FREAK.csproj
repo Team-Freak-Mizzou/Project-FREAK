@@ -1,26 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <RootNamespace>Project_FREAK</RootNamespace>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-	<EnableWindowsTargeting>true</EnableWindowsTargeting>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<RootNamespace>Project_FREAK</RootNamespace>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
-	<PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
-	<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
-	<PackageReference Include="System.Drawing.Common" Version="9.0.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Assets\FONTS\nasalization-rg.otf" />
+		<None Remove="Assets\FONTS\Roboto-Regular.ttf" />
+		<None Remove="Assets\LIBRARIES\LabJack.LJM.dll" />
+		<None Remove="Assets\LOGOS\MSP_LOGO_BG.png" />
+		<None Remove="Assets\LOGOS\MSP_LOGO_WG.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="LabJack.LJM">
-      <HintPath>F:\Program Files\LabJack\Drivers\LabJack.LJM.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
+		<PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
+		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
+		<PackageReference Include="System.Drawing.Common" Version="9.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="LabJack.LJM">
+		</Reference>
+
+		<Content Include="Assets\FONTS\nasalization-rg.otf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\FONTS\Roboto-Regular.ttf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\LIBRARIES\LabJack.LJM.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Resource Include="Assets\LOGOS\MSP_LOGO_BG.png" />
+		<Resource Include="Assets\LOGOS\MSP_LOGO_WG.png" />
+	</ItemGroup>
 
 </Project>
