@@ -18,27 +18,14 @@ namespace Project_FREAK
         public MainWindow()
         {
             InitializeComponent();
-            MainFrame.Navigate(new HomePage());     // Navigate to HomePage upon startup
-            UpdateMenuItems("Home");
+            MainFrame.Navigate(new RecordPage());   // Navigate to RecordPage on startup
         }
 
         public void NavigateToPage(Page page, string pageName)
         {
             MainFrame.Navigate(page);
-            UpdateMenuItems(pageName);
         }
 
-        private void UpdateMenuItems(string currentPage)
-        {
-            foreach (var subItem in NavigationMenu.Items)
-            {
-                if (subItem is MenuItem subMenuItem)
-                {   // Enable the menu item if it is not the current page, and disable it if it is the current page
-                    subMenuItem.IsEnabled = subMenuItem.Header.ToString() != currentPage;
-                    subMenuItem.IsChecked = subMenuItem.Header.ToString() == currentPage;
-                }
-            }
-        }
 
         private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -47,19 +34,9 @@ namespace Project_FREAK
             settingsWindow.Show();
         }
 
-        private void HomeMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToPage(new HomePage(), "Home");
-        }
-
         private void RecordMenuItem_Click(object sender, RoutedEventArgs e)
         {
             NavigateToPage(new RecordPage(), "Record");
-        }
-
-        private void ReplayMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToPage(new ReplayPage(), "Replay");
         }
     }
 }
