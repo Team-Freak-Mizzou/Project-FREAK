@@ -11,12 +11,6 @@
         <DockPanel>
             <!-- Persistent Menu that stays even when you navigate to a different page -->
             <Menu x:Name="MainMenu" DockPanel.Dock="Top" Background="DarkGray">
-                <!-- Navigation Menu Items -->
-                <MenuItem x:Name="NavigationMenu" Header="Navigation">
-                    <MenuItem x:Name="HomeMenuItem" Header="Home" Click="HomeMenuItem_Click" IsCheckable="True"/>
-                    <MenuItem x:Name="RecordMenuItem" Header="Record" Click="RecordMenuItem_Click" IsCheckable="True"/>
-                    <MenuItem x:Name="ReplayMenuItem" Header="Replay" Click="ReplayMenuItem_Click" IsCheckable="True"/>
-                </MenuItem>
                 <MenuItem Header="Settings" Click="SettingsMenuItem_Click"/>
             </Menu>
             <!-- Frame for Navigation -->
