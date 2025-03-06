@@ -142,15 +142,18 @@
                         </Viewbox>
                     </Button>
 
-                    <Button Grid.Row="1" Grid.Column="1" 
+                    <Button 
+                            Name ="btnSave"
+                            Grid.Row="1" Grid.Column="1" 
                             Background="Purple" 
                             Margin="1"
                             HorizontalAlignment="Stretch" 
                             VerticalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
-                            VerticalContentAlignment="Stretch">
+                            VerticalContentAlignment="Stretch"
+                            Click="btnSave_Click">
                         <Viewbox Stretch="Uniform">
-                            <TextBlock Text="Save" Foreground="White" Margin="2"/>
+                            <TextBlock Text="Save" Foreground="White" Margin="2" />
                         </Viewbox>
                     </Button>
                 </Grid>

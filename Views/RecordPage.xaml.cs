@@ -21,6 +21,9 @@ using System.Windows.Threading;
 using ScottPlot;
 using ScottPlot.WPF;
 using ScottPlot.Plottables;
+using System.Text.Json;
+using System.IO;
+using Microsoft.Win32;
 
 namespace Project_FREAK.Views
 {
@@ -50,6 +53,7 @@ namespace Project_FREAK.Views
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
         }
+        private bool _isSaving = false;
         //thrust in N, pressure in PSI
         private List<double> timeData = new List<double>();
         private List<double> thrustData = new List<double>();
@@ -58,6 +62,7 @@ namespace Project_FREAK.Views
         private const double WindowSize = 10; // Sliding window size (e.g., 10 seconds)
         private void UpdateGraphs(double thrustVoltage, double calibratedThrust, double pressureVoltage, double calibratedPressure)
         {
+            if (_isSaving) return; // Prevent updates while saving
             double elapsedTime = (DateTime.Now - startTime).TotalSeconds;
 
             // Store data points
@@ -72,26 +77,53 @@ namespace Project_FREAK.Views
                 thrustData.RemoveAt(0);
                 pressureData.RemoveAt(0);
             }
+
+            // Ensure only 10 data points are stored (adjust as needed)
+            while (timeData.Count > WindowSize)
+            {
+                timeData.RemoveAt(0);
+                thrustData.RemoveAt(0);
+                pressureData.RemoveAt(0);
+            }
+
             Dispatcher.Invoke(() =>
             {
+                if (_isSaving) return; // Double-check before updating UI
                 // Update Thrust Graph
                 ThrustGraph.Plot.Clear();
-                ThrustGraph.Plot.Add.Scatter(timeData.ToArray(), thrustData.ToArray());
+                ThrustGraph.Plot.Add.SignalXY(timeData.ToArray(), thrustData.ToArray());
                 ThrustGraph.Plot.Axes.Bottom.Label.Text = "Time (s)";
                 ThrustGraph.Plot.Axes.Left.Label.Text = "Thrust (N)";
                 ThrustGraph.Plot.Title("Thrust Over Time");
                 ThrustGraph.Plot.Axes.SetLimitsX(Math.Max(0, elapsedTime - WindowSize), elapsedTime);
+                ThrustGraph.Plot.Axes.AutoScaleY();  // Auto-scale the Y-axis
                 ThrustGraph.Refresh();
 
                 // Update Pressure Graph
                 PressureGraph.Plot.Clear();
-                PressureGraph.Plot.Add.Scatter(timeData.ToArray(), pressureData.ToArray());
+                PressureGraph.Plot.Add.SignalXY(timeData.ToArray(), pressureData.ToArray());
                 PressureGraph.Plot.Axes.Bottom.Label.Text = "Time (s)";
                 PressureGraph.Plot.Axes.Left.Label.Text = "Pressure (PSI)";
                 PressureGraph.Plot.Title("Pressure Over Time");
                 PressureGraph.Plot.Axes.SetLimitsX(Math.Max(0, elapsedTime - WindowSize), elapsedTime);
+                PressureGraph.Plot.Axes.AutoScaleY();  // Auto-scale the Y-axis
                 PressureGraph.Refresh();
             });
+        }
+
+        private void ExportDataToJson(string filePath)
+        {
+            var data = new
+            {
+                time_values = timeData,
+                load_cell_voltages_mv = thrustData,  // Assuming thrust data corresponds to load cell voltages (in mV)
+                pressure_transducer_voltages_v = pressureData // Assuming pressure data corresponds to transducer voltages (in V)
+            };
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(data, options);
+
+            File.WriteAllText(filePath, json);
         }
         // Load the webcam input on a background thread and start the loading text animation.
         private async void RecordPage_Loaded(object sender, RoutedEventArgs e)
@@ -319,6 +351,32 @@ namespace Project_FREAK.Views
                 StartTestTextBlock.Text = "Igniting Motor!";
                 LabJackHandleManager.Instance.IgniteMotor();
             }
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            // Prevent updates to the graphs during saving
+            _isSaving = true;
+
+            // Create and show SaveFileDialog for selecting file path
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "JSON files (*.json)|*.json",
+                Title = "Save Data as JSON",
+                FileName = "data_export.json"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filePath = saveFileDialog.FileName;
+
+                // Export the data to JSON file
+                ExportDataToJson(filePath);
+                MessageBox.Show("Data successfully saved!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            // Re-enable graph updates after saving
+            _isSaving = false;
         }
     }
 }
