@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_FREAK.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,14 +24,14 @@ namespace Project_FREAK.Views
         {
             InitializeComponent();
             //begin to subscribe to labjack data updates through action
-            LabJackHandleManager.Instance.DataUpdated += UpdateSensors;
+            LabJackManager.Instance.DataUpdated += UpdateSensors;
             //check if a device is connected
             UpdateLabjackStatus();
 
         }
         private void UpdateLabjackStatus()
         {
-            if (LabJackHandleManager.Instance.IsDemo())
+            if (LabJackManager.Instance.IsDemo())
             {
                 //in demo mode, update UI
                 DemoModeStatus.Text = "❌";
@@ -64,10 +65,10 @@ namespace Project_FREAK.Views
 
         private void ReconnectButton_Click(object sender, RoutedEventArgs e)
         {
-            LabJackHandleManager.Instance.CloseDevice();
-            _ = LabJackHandleManager.Instance; //create LabJack device handle to reconnect to
+            LabJackManager.Instance.CloseDevice();
+            _ = LabJackManager.Instance; //create LabJack device handle to reconnect to
             UpdateLabjackStatus();
-            LabJackHandleManager.Instance.DataUpdated += UpdateSensors;
+            LabJackManager.Instance.DataUpdated += UpdateSensors;
             
         }
     }

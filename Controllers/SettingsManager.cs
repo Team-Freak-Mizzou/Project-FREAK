@@ -10,7 +10,7 @@ public class SettingsManager : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler? AppliedSettingsChanged;
 
-    // Paths
+    // Paths to the settings files
     private static readonly string SavedSettingsPath = Path.Combine(
         AppDomain.CurrentDomain.BaseDirectory,
         "Assets", "CONFIG", "saved_settings.json");
@@ -27,7 +27,7 @@ public class SettingsManager : INotifyPropertyChanged
         private set
         {
             _appliedSettings = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AppliedSettings)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AppliedSettings))); // Notify when AppliedSettings changes
         }
     }
 
@@ -37,6 +37,7 @@ public class SettingsManager : INotifyPropertyChanged
         LoadAppliedSettings();
     }
 
+    // Loads saved settings from disk
     public void LoadSavedSettings()
     {
         try
@@ -45,38 +46,41 @@ public class SettingsManager : INotifyPropertyChanged
             {
                 var json = File.ReadAllText(SavedSettingsPath);
                 var settings = JsonSerializer.Deserialize<SettingsData>(json);
-                AppliedSettings = settings ?? new SettingsData();
+                AppliedSettings = settings ?? new SettingsData(); // Set AppliedSettings to the loaded settings or a new instance if null
             }
         }
         catch { /* Handle errors */ }
     }
 
+    // Saves the applied settings to disk
     public void SaveAppliedSettingsToDisk()
     {
         try
         {
             var json = JsonSerializer.Serialize(AppliedSettings);
-            Directory.CreateDirectory(Path.GetDirectoryName(SavedSettingsPath)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(SavedSettingsPath)!); // Ensure the directory exists
             File.WriteAllText(SavedSettingsPath, json);
         }
         catch { /* Handle errors */ }
     }
 
+    // Updates the applied settings and saves them to disk
     public void UpdateAppliedSettings(SettingsData newSettings)
     {
         AppliedSettings = newSettings;
-        AppliedSettingsChanged?.Invoke(this, EventArgs.Empty);
+        AppliedSettingsChanged?.Invoke(this, EventArgs.Empty); // Trigger the AppliedSettingsChanged event
 
         // Save applied settings to session file
         try
         {
             var json = JsonSerializer.Serialize(newSettings);
-            Directory.CreateDirectory(Path.GetDirectoryName(AppliedSettingsPath)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(AppliedSettingsPath)!); // Ensure the directory exists
             File.WriteAllText(AppliedSettingsPath, json);
         }
         catch { /* Handle errors */ }
     }
 
+    // Loads the applied settings from disk
     public void LoadAppliedSettings()
     {
         try
@@ -85,14 +89,16 @@ public class SettingsManager : INotifyPropertyChanged
             {
                 var json = File.ReadAllText(AppliedSettingsPath);
                 var settings = JsonSerializer.Deserialize<SettingsData>(json);
-                AppliedSettings = settings ?? new SettingsData();
+                AppliedSettings = settings ?? new SettingsData(); // Set AppliedSettings to the loaded settings or a new instance if null
             }
         }
         catch { /* Handle errors */ }
     }
 
+    // Class representing the settings data
     public class SettingsData
     {
-        public bool DemoModeEnabled { get; set; }
+        public bool DemoModeEnabled { get; set; } // Indicates if demo mode is enabled
+        public string RtspUrl { get; set; } = "rtsp://admin:MSPMOTORTEST2025@192.168.20.4:554/cam/realmonitor?channel=1&subtype=0"; // Default RTSP URL
     }
 }

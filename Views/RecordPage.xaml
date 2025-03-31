@@ -53,7 +53,7 @@
         VerticalAlignment="Stretch">
             <Grid>
                 <!-- The webcam feed will be loaded into this Image -->
-                <Image x:Name="WebcamImage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <Image x:Name="WebcamImage" Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 <!-- This TextBlock overlays the Image until the webcam feed is ready -->
                 <TextBlock x:Name="LoadingTextBlock"
                    Text="Loading."
