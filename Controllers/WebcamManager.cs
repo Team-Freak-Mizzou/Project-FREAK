@@ -18,6 +18,11 @@ namespace Project_FREAK.Controllers
         private readonly Dispatcher _dispatcher; // Dispatcher to ensure UI updates occur on the main thread
         public event Action<string>? CameraError; // Event triggered when a camera error occurs
 
+        private VideoWriter? _videoWriter;
+        public int FrameWidth { get; private set; }
+        public int FrameHeight { get; private set; }
+        public double Fps { get; private set; }
+
         [DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject); // External method to delete GDI objects
 
@@ -32,19 +37,22 @@ namespace Project_FREAK.Controllers
             try
             {
                 if (demoMode)
-                    _capture = new VideoCapture(0); // Open the default camera in demo mode
+                    _capture = new VideoCapture(0);
                 else if (!string.IsNullOrEmpty(rtspUrl))
-                    _capture = new VideoCapture(rtspUrl); // Open the RTSP stream if URL is provided
+                    _capture = new VideoCapture(rtspUrl);
 
                 if (_capture?.IsOpened() == true)
                 {
-                    //_capture.Set(VideoCaptureProperties.BufferSize, 1); // TODO REMOVE THIS LINE
-                    StartCaptureLoop(); // Start capturing frames
+                    FrameWidth = (int)_capture.Get(VideoCaptureProperties.FrameWidth);
+                    FrameHeight = (int)_capture.Get(VideoCaptureProperties.FrameHeight);
+                    Fps = _capture.Get(VideoCaptureProperties.Fps);
+                    if (Fps <= 0) Fps = 30;
+                    StartCaptureLoop();
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Camera initialization failed", ex); // Propagate the exception
+                throw new Exception("Camera initialization failed", ex);
             }
         }
 
@@ -70,6 +78,7 @@ namespace Project_FREAK.Controllers
                             break;
                         if (!frame.Empty())
                         {
+                            _videoWriter?.Write(frame); // Write the frame to the video file if recording
                             using var bmp = frame.ToBitmap(); // Convert the frame to a bitmap
                             var hBitmap = bmp.GetHbitmap();
                             var bitmap = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // Create a BitmapSource from the handle
@@ -87,12 +96,30 @@ namespace Project_FREAK.Controllers
             }, _cts.Token);
         }
 
+        public void StartRecording(string filePath)
+        {
+            if (_capture == null || !_capture.IsOpened())
+                throw new InvalidOperationException("Camera not initialized.");
+
+            int fourcc = VideoWriter.FourCC('m', 'p', '4', 'v');
+            _videoWriter = new VideoWriter(filePath, fourcc, Fps, new OpenCvSharp.Size(FrameWidth, FrameHeight));
+            if (!_videoWriter.IsOpened())
+                throw new Exception("Failed to initialize video writer.");
+        }
+
+        public void StopRecording()
+        {
+            _videoWriter?.Release();
+            _videoWriter = null;
+        }
+
         // Disposes the webcam manager and releases resources
         public void Dispose()
         {
-            _cts?.Cancel(); // Cancel the capture loop
-            _capture?.Dispose(); // Dispose the video capture
-            GC.SuppressFinalize(this); // Suppress finalization
+            _cts?.Cancel();
+            _capture?.Dispose();
+            _videoWriter?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using Project_FREAK.Controllers;
 using Microsoft.Win32;
 using System.Collections.Concurrent;
+using System.IO;
 
 namespace Project_FREAK.Views
 {
@@ -24,7 +25,11 @@ namespace Project_FREAK.Views
 
         private DateTime _startTime; // Start time of the recording
         private bool _isSaving = false;
+        private bool _isRecording = false; // Flag to indicate if recording is in progress
         private const int graphFPS = 30;
+
+        private string? _currentSessionFolder;
+        private string? _currentVideoPath;
 
         public RecordPage()
         {
@@ -133,6 +138,7 @@ namespace Project_FREAK.Views
             {
                 StartTestTextBlock.Text = "Igniting Motor!"; // Update text to indicate motor ignition
                 _labjackManager.IgniteMotor(); // Ignite the motor
+                StartVideoRecording(); // Start recording after ignition
             });
         }
 
@@ -155,29 +161,52 @@ namespace Project_FREAK.Views
         // Handles the click event of the Start Test button
         private void StartTestButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_labjackManager.GetArmedStatus())
+            if (_labjackManager.GetArmedStatus() && !_isRecording)
             {
                 _countdownService.ToggleCountdown(5); // Start the countdown if the igniter is armed
+            } 
+            else if (_isRecording)
+            {
+                _webcamManager.StopRecording();
+                _isRecording = false;
+                StartTestTextBlock.Text = "Start";
+                StartButton.Background = Brushes.Green;
+
+                _currentSessionFolder = null;
+                _currentVideoPath = null;
             }
         }
 
         // Handles the click event of the Save button
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            _isSaving = true; // Set saving flag
-            var saveDialog = new SaveFileDialog
+            if (_currentSessionFolder == null)
             {
-                Filter = "JSON files (*.json)|*.json",
-                FileName = "test_data.json"
-            };
-
-            if (saveDialog.ShowDialog() == true)
-            {
-                _dataRecorder.ExportToJson(saveDialog.FileName); // Export data to JSON file
-                MessageBox.Show("Data saved successfully!", "Success",
-                    MessageBoxButton.OK, MessageBoxImage.Information); // Show success message
+                MessageBox.Show("No active test session to save!", "Warning",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            _isSaving = false; // Reset saving flag
+
+            try
+            {
+                _isSaving = true;
+                var jsonFileName = $"data_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json";
+                var jsonPath = Path.Combine(_currentSessionFolder, jsonFileName);
+
+                _dataRecorder.ExportToJson(jsonPath);
+
+                MessageBox.Show($"Data and video saved in:\n{_currentSessionFolder}", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving data: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                _isSaving = false;
+            }
         }
 
         // Handles the Unloaded event of the page
@@ -215,6 +244,35 @@ namespace Project_FREAK.Views
             else
             {
                 _sensorCheckWindow.Activate(); // Activate the existing sensor check window
+            }
+        }
+
+        private void StartVideoRecording()
+        {
+            try
+            {
+                // Create timestamped folder
+                var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+                _currentSessionFolder = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "RocketTests",
+                    timestamp);
+
+                Directory.CreateDirectory(_currentSessionFolder);
+
+                // Generate filenames
+                var videoFileName = $"test_{timestamp}.mp4";
+                _currentVideoPath = Path.Combine(_currentSessionFolder, videoFileName);
+
+                _webcamManager.StartRecording(_currentVideoPath);
+                _isRecording = true;
+                StartTestTextBlock.Text = "Stop Recording";
+                StartButton.Background = Brushes.Red;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error starting recording: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
