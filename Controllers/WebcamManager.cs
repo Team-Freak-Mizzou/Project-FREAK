@@ -8,10 +8,11 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using OpenCvSharp.WpfExtensions;
 
 namespace Project_FREAK.Controllers
 {
-    public class WebcamManager : IDisposable
+    public partial class WebcamManager : IDisposable
     {
         private VideoCapture? _capture; // Manages video capture from a camera or video file
         private CancellationTokenSource? _cts; // Token source to cancel the capture loop
@@ -24,15 +25,10 @@ namespace Project_FREAK.Controllers
         public int FrameHeight { get; private set; }
         public double Fps { get; private set; }
 
-        [DllImport("gdi32.dll")]
-        private static extern bool DeleteObject(IntPtr hObject); // External method to delete GDI objects
-
-        // Constructor that initializes the webcam manager with a dispatcher
         public WebcamManager(Dispatcher dispatcher)
         {
             _dispatcher = dispatcher;
         }
-
 
         // Initializes the webcam manager asynchronously
         public async Task InitializeAsync(bool demoMode, string? rtspUrl = null)
@@ -79,29 +75,28 @@ namespace Project_FREAK.Controllers
             _cts = new CancellationTokenSource();
             Task.Run(async () =>
             {
-                var targetFrameTime = TimeSpan.FromSeconds(1 / Fps); // Calculate target frame time based on FPS
-                var sw = new Stopwatch();   // Stopwatch to measure frame processing time
+                var targetFrameTime = TimeSpan.FromSeconds(1 / Fps);
+                var sw = new Stopwatch();
 
                 while (!_cts!.IsCancellationRequested && _capture?.IsOpened() == true)
                 {
-                    sw.Restart(); // Start the stopwatch
+                    sw.Restart();
                     try
                     {
                         using var frame = new Mat();
-                        if (!_capture.Read(frame) || frame.Empty()) continue;   // Read a frame from the camera
+                        if (!_capture.Read(frame) || frame.Empty()) continue;
 
-                        _videoWriter?.Write(frame); // Write the frame to the video file if recording
+                        _videoWriter?.Write(frame);
 
-                        using var bmp = frame.ToBitmap(); // Convert the frame to a bitmap
-                        var hBitmap = bmp.GetHbitmap();
-                        var bitmap = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // Create a BitmapSource from the handle
+                        // Convert Mat to WPF's WriteableBitmap directly
+                        var bitmap = frame.ToWriteableBitmap();
                         bitmap.Freeze();
-                        DeleteObject(hBitmap); // Delete the GDI object
-                        _dispatcher.Invoke(() => FrameReceived?.Invoke(bitmap)); // Invoke the FrameReceived event on the UI thread
 
-                        var processingTime = sw.Elapsed;    // Measure the time taken to process the frame
-                        var delay = targetFrameTime - processingTime;   // Calculate the delay to maintain the target frame rate
-                        if (delay > TimeSpan.Zero) await Task.Delay(delay); // Delay the loop to maintain the target frame rate
+                        _dispatcher.Invoke(() => FrameReceived?.Invoke(bitmap));
+
+                        var processingTime = sw.Elapsed;
+                        var delay = targetFrameTime - processingTime;
+                        if (delay > TimeSpan.Zero) await Task.Delay(delay);
                     }
                     catch (Exception ex)
                     {

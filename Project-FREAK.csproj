@@ -24,6 +24,7 @@
 		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
 		<PackageReference Include="System.Drawing.Common" Version="9.0.2" />
 		<PackageReference Include="ScottPlot.Wpf" Version="5.0.54" />
+		<PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.10.0.20241108" />
 	</ItemGroup>
 
 	<ItemGroup>
