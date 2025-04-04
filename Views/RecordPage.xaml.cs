@@ -13,17 +13,16 @@ namespace Project_FREAK.Views
 {
     public partial class RecordPage : Page
     {
-        private readonly WebcamManager _webcamManager;
-        private readonly GraphManager _graphManager;
-        private readonly LabJackManager _labjackManager;
-        private readonly DataRecorder _dataRecorder; // Records data points
-        private readonly CountdownService _countdownService;
+        private WebcamManager _webcamManager = null!;
+        private GraphManager _graphManager = null!;
+        private LabJackManager _labjackManager = null!;
+        private DataRecorder _dataRecorder = null!; // Records data points
+        private CountdownService _countdownService = null!;
         private readonly Stopwatch _stopwatch = new(); // Stopwatch to track elapsed time
         private readonly Stopwatch _graphUpdateStopwatch = new(); // Stopwatch to control graph update rate
         private readonly ConcurrentQueue<(double time, double thrust, double pressure, double thrustVoltage, double pressureVoltage)> _dataQueue = new(); // Queue to store data points
         private SensorCheckWindow? _sensorCheckWindow; // Window for sensor check
 
-        private DateTime _startTime; // Start time of the recording
         private bool _isSaving = false;
         private bool _isRecording = false; // Flag to indicate if recording is in progress
         private const int graphFPS = 30;
@@ -34,25 +33,7 @@ namespace Project_FREAK.Views
         public RecordPage()
         {
             InitializeComponent();
-
-            // Initialize managers
-            _graphManager = new GraphManager(ThrustGraph, PressureGraph);
-            _labjackManager = LabJackManager.Instance;
-            _webcamManager = new WebcamManager(Dispatcher);
-            _dataRecorder = new DataRecorder();
-            _countdownService = new CountdownService(Dispatcher);
-
-            // Setup event subscriptions
             Loaded += RecordPage_Loaded;
-            Unloaded += RecordPage_Unloaded;
-            _labjackManager.DataUpdated += UpdateGraphs;
-            _countdownService.CountdownUpdated += UpdateCountdownDisplay;
-            _countdownService.CountdownFinished += HandleCountdownCompletion;
-
-            SetupTimer();
-            SubscribeToSettingsChanges();
-
-            _graphUpdateStopwatch.Start(); // Start the stopwatch for controlling graph updates
         }
 
         // Sets up the countdown timer interval
@@ -70,9 +51,33 @@ namespace Project_FREAK.Views
         // Handles the Loaded event of the page
         private async void RecordPage_Loaded(object sender, RoutedEventArgs e)
         {
+            // Initialize managers asynchronously
+            await InitializeManagersAsync();
+
             _stopwatch.Start();
             SetupCameraEvents();
             await InitializeCamera();
+        }
+
+        private Task InitializeManagersAsync()
+        {
+            _graphManager = new GraphManager(ThrustGraph, PressureGraph);
+            _labjackManager = LabJackManager.Instance; // Ensure LabJackManager is thread-safe
+            _webcamManager = new WebcamManager(Dispatcher);
+            _dataRecorder = new DataRecorder();
+            _countdownService = new CountdownService(Dispatcher);
+
+            // Subscribe to events
+            Unloaded += RecordPage_Unloaded;
+            _labjackManager.DataUpdated += UpdateGraphs;
+            _countdownService.CountdownUpdated += UpdateCountdownDisplay;
+            _countdownService.CountdownFinished += HandleCountdownCompletion;
+
+            SetupTimer();
+            SubscribeToSettingsChanges();
+            _graphUpdateStopwatch.Start();
+
+            return Task.CompletedTask; // Return completed task
         }
 
         // Initializes the camera

@@ -33,15 +33,19 @@ namespace Project_FREAK.Controllers
             _dispatcher = dispatcher;
         }
 
+
         // Initializes the webcam manager asynchronously
         public async Task InitializeAsync(bool demoMode, string? rtspUrl = null)
         {
             try
             {
-                if (demoMode)
-                    _capture = new VideoCapture(0);
-                else if (!string.IsNullOrEmpty(rtspUrl))
-                    _capture = new VideoCapture(rtspUrl);
+                await Task.Run(() =>
+                {
+                    if (demoMode)
+                        _capture = new VideoCapture(0);
+                    else if (!string.IsNullOrEmpty(rtspUrl))
+                        _capture = new VideoCapture(rtspUrl);
+                });
 
                 if (_capture?.IsOpened() == true)
                 {
@@ -130,7 +134,7 @@ namespace Project_FREAK.Controllers
         }
 
         // Checks if the specified FourCC codec is supported
-        private bool IsFourccSupported(int fourcc)
+        private static bool IsFourccSupported(int fourcc)
         {
             try
             {

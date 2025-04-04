@@ -10,19 +10,20 @@ using System.Xml.Linq;
 
 namespace Project_FREAK.Controllers
 {
-    public class LabJackManager
+    public class LabJackManager : IDisposable
     {
         private int _handle = -1; // Handle for the LabJack device
         private bool _isDemo = true; // Indicates if the device is in demo mode
         private bool _isIgniterArmed = false; // Indicates if the igniter is armed
-        private static LabJackManager _instance; // Singleton instance
+        private static LabJackManager _instance = null!; // Singleton instance
         private bool _isReading; // Indicates if data is being read from the device
-        public event Action<double, double, double, double> DataUpdated; // Event triggered when data is updated
-        private Timer _returnTimer; // Timer to return DAC0 to zero
+        public event Action<double, double, double, double> DataUpdated = delegate { }; // Event triggered when data is updated
+        private Timer? _returnTimer; // Timer to return DAC0 to zero
 
         private LabJackManager()
         {
             InitalizeLabJack(); // Initialize the LabJack device
+            Task.Run(() => InitalizeLabJack()); // Initialize LabJack on a background thread.
             StartReading(); // Start reading data from the device
         }
 
@@ -39,14 +40,14 @@ namespace Project_FREAK.Controllers
                 // LabJack T4 configuration
                 // Resolution index = 0 (default)
                 // Settling = 0 (auto)
-                string[] aNames = new string[] { "AIN0_RESOLUTION_INDEX", "AIN5_RESOLUTION_INDEX",
-                            "AIN0_SETTLING_US", "AIN5_SETTLING_US" };
-                double[] aValues = new double[] { 0, 0, 0, 0 };
+                var aNames = new[] { "AIN0_RESOLUTION_INDEX", "AIN5_RESOLUTION_INDEX",
+                                     "AIN0_SETTLING_US", "AIN5_SETTLING_US" };
+                var aValues = new[] { 0.0, 0.0, 0.0, 0.0 };
                 int numFrames = aNames.Length;
                 int errorAddress = -1;
                 LJM.eWriteNames(_handle, numFrames, aNames, aValues, ref errorAddress);
             }
-            catch (LJM.LJMException exception)
+            catch
             {
                 // Open in demo mode if device not found
                 LJM.OpenS("ANY", "ANY", "LJM_DEMO_MODE", ref _handle);
@@ -81,7 +82,7 @@ namespace Project_FREAK.Controllers
         }
 
         // Returns DAC0 to zero voltage
-        private void ReturnToZero(object state)
+        private void ReturnToZero(object? state)
         {
             LJM.eWriteName(_handle, "DAC0", 0.0);
             _returnTimer?.Dispose();
@@ -151,12 +152,16 @@ namespace Project_FREAK.Controllers
                 // Stop reading, and close device
                 _isReading = false;
                 LJM.Close(_handle);
-                _instance = null;
+                _instance = null!;
                 _handle = -1;
             }
         }
 
         // Disposes the LabJackManager and closes the device
-        public void Dispose() => CloseDevice();
+        public void Dispose()
+        {
+            CloseDevice();
+            GC.SuppressFinalize(this);
+        }
     }
     }

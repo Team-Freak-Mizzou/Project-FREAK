@@ -26,29 +26,37 @@ namespace Project_FREAK
         {
             MainFrame.Navigate(new LoadingPage()); // Navigate to LoadingPage first (Static page to allow for async loading of the app)
 
-            await Task.Yield(); // Yield to the dispatcher to allow the UI to update
+            // Force UI to render LoadingPage
+            await Task.Delay(10); // Small delay to allow rendering
+            MainFrame.UpdateLayout();
 
-            await Dispatcher.InvokeAsync(() =>  // Make sure we appease the Microsoft gods before attempting to navigate to the RecordPage
+            // Navigate to RecordPage without blocking
+            await Task.Run(() =>
             {
-                MainFrame.Navigate(new RecordPage());
-            }, DispatcherPriority.Background);
+                Dispatcher.Invoke(() =>
+                {
+                    MainFrame.Navigate(new RecordPage());
+                });
+            });
         }
 
-        public void NavigateToPage(Page page, string pageName)
+        public void NavigateToPage(Page page)
         {
             MainFrame.Navigate(page);
         }
 
         private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var settingsWindow = new SettingsWindow();  // Create a new instance of the SettingsWindow
-            settingsWindow.Owner = this;    // Set the owner of the SettingsWindow to be the MainWindow
+            var settingsWindow = new SettingsWindow
+            {
+                Owner = this // Set the owner of the SettingsWindow to be the MainWindow
+            };
             settingsWindow.Show();
         }
 
         private void RecordMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPage(new RecordPage(), "Record");
+            NavigateToPage(new RecordPage());
         }
     }
 }
