@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,6 +27,7 @@ namespace Project_FREAK.Controllers
         [DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject); // External method to delete GDI objects
 
+        // Constructor that initializes the webcam manager with a dispatcher
         public WebcamManager(Dispatcher dispatcher)
         {
             _dispatcher = dispatcher;
@@ -46,7 +48,11 @@ namespace Project_FREAK.Controllers
                     FrameWidth = (int)_capture.Get(VideoCaptureProperties.FrameWidth);
                     FrameHeight = (int)_capture.Get(VideoCaptureProperties.FrameHeight);
                     Fps = _capture.Get(VideoCaptureProperties.Fps);
-                    if (Fps <= 0) Fps = 30;
+                    if (Fps <= 0 || Fps > 60)
+                    {
+                        // Default to 30 FPS if invalid or unrealistic value
+                        Fps = 30;
+                    }
                     StartCaptureLoop();
                 }
             }
@@ -69,24 +75,29 @@ namespace Project_FREAK.Controllers
             _cts = new CancellationTokenSource();
             Task.Run(async () =>
             {
+                var targetFrameTime = TimeSpan.FromSeconds(1 / Fps); // Calculate target frame time based on FPS
+                var sw = new Stopwatch();   // Stopwatch to measure frame processing time
+
                 while (!_cts!.IsCancellationRequested && _capture?.IsOpened() == true)
                 {
+                    sw.Restart(); // Start the stopwatch
                     try
                     {
-                        using var frame = new Mat(); // Create a new frame
-                        if (!_capture.Read(frame))
-                            break;
-                        if (!frame.Empty())
-                        {
-                            _videoWriter?.Write(frame); // Write the frame to the video file if recording
-                            using var bmp = frame.ToBitmap(); // Convert the frame to a bitmap
-                            var hBitmap = bmp.GetHbitmap();
-                            var bitmap = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // Create a BitmapSource from the handle
-                            bitmap.Freeze();
-                            DeleteObject(hBitmap); // Delete the GDI object
-                            _dispatcher.Invoke(() => FrameReceived?.Invoke(bitmap)); // Invoke the FrameReceived event on the UI thread
-                        }
-                        await Task.Delay((int)(1000 / Math.Max(_capture?.Fps ?? 30, 1))); // Delay to match the frame rate
+                        using var frame = new Mat();
+                        if (!_capture.Read(frame) || frame.Empty()) continue;   // Read a frame from the camera
+
+                        _videoWriter?.Write(frame); // Write the frame to the video file if recording
+
+                        using var bmp = frame.ToBitmap(); // Convert the frame to a bitmap
+                        var hBitmap = bmp.GetHbitmap();
+                        var bitmap = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // Create a BitmapSource from the handle
+                        bitmap.Freeze();
+                        DeleteObject(hBitmap); // Delete the GDI object
+                        _dispatcher.Invoke(() => FrameReceived?.Invoke(bitmap)); // Invoke the FrameReceived event on the UI thread
+
+                        var processingTime = sw.Elapsed;    // Measure the time taken to process the frame
+                        var delay = targetFrameTime - processingTime;   // Calculate the delay to maintain the target frame rate
+                        if (delay > TimeSpan.Zero) await Task.Delay(delay); // Delay the loop to maintain the target frame rate
                     }
                     catch (Exception ex)
                     {
@@ -96,17 +107,40 @@ namespace Project_FREAK.Controllers
             }, _cts.Token);
         }
 
+        // Starts recording video to the specified file path
         public void StartRecording(string filePath)
         {
             if (_capture == null || !_capture.IsOpened())
                 throw new InvalidOperationException("Camera not initialized.");
 
-            int fourcc = VideoWriter.FourCC('m', 'p', '4', 'v');
-            _videoWriter = new VideoWriter(filePath, fourcc, Fps, new OpenCvSharp.Size(FrameWidth, FrameHeight));
+            int fourcc = VideoWriter.FourCC('a', 'v', 'c', '1');    // Default to AVC codec
+            if (!IsFourccSupported(fourcc))
+            {
+                fourcc = VideoWriter.FourCC('m', 'p', '4', 'v');    // Fallback to MP4V codec
+            }
+            _videoWriter = new VideoWriter(     // Initialize the video writer
+                filePath,
+                fourcc,
+                Fps,
+                new OpenCvSharp.Size(FrameWidth, FrameHeight)
+            );
+
             if (!_videoWriter.IsOpened())
                 throw new Exception("Failed to initialize video writer.");
         }
 
+        // Checks if the specified FourCC codec is supported
+        private bool IsFourccSupported(int fourcc)
+        {
+            try
+            {
+                using var testWriter = new VideoWriter("test.mp4", fourcc, 30, new OpenCvSharp.Size(640, 480));
+                return testWriter.IsOpened();
+            }
+            catch { return false; }
+        }
+
+        // Stops the video recording
         public void StopRecording()
         {
             _videoWriter?.Release();
