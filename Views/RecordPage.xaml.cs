@@ -231,10 +231,33 @@ namespace Project_FREAK.Views
         // Handles settings changes
         private async void SettingsChangedHandler(object? sender, EventArgs e)
         {
-            await _webcamManager.ReinitializeAsync(
-                ((App)Application.Current).SettingsManager.AppliedSettings.DemoModeEnabled,
-                ((App)Application.Current).SettingsManager.AppliedSettings.RtspUrl
-            ); // Reinitialize the webcam with new settings
+            try
+            {
+                // Show loading text and reset message
+                Dispatcher.Invoke(() =>
+                {
+                    LoadingTextBlock.Text = "Loading...";
+                    LoadingTextBlock.Visibility = Visibility.Visible;
+                });
+
+                // Reinitialize webcam with new settings
+                await _webcamManager.ReinitializeAsync(
+                    ((App)Application.Current).SettingsManager.AppliedSettings.DemoModeEnabled,
+                    ((App)Application.Current).SettingsManager.AppliedSettings.RtspUrl
+                );
+
+                // Hide loading text on success
+                Dispatcher.Invoke(() => LoadingTextBlock.Visibility = Visibility.Collapsed);
+            }
+            catch (Exception ex)
+            {
+                // Show error message
+                Dispatcher.Invoke(() =>
+                {
+                    LoadingTextBlock.Text = $"Camera Error: {ex.Message}";
+                    LoadingTextBlock.Visibility = Visibility.Visible;
+                });
+            }
         }
 
         // Handles the click event of the Sensor Check button
