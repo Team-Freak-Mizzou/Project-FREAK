@@ -3,7 +3,7 @@
   <!-- 1) Default for ALL OSes: only build a plain net8.0 library -->
   <PropertyGroup>
     <!-- plain library target so CI”s Linux restore/build succeeds -->
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
