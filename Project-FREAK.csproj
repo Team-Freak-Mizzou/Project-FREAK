@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
-		<RootNamespace>Project_FREAK</RootNamespace>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<UseWPF>true</UseWPF>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+    		<OutputType>WinExe</OutputType>
+   		<TargetFramework>net8.0-windows</TargetFramework>
+   		<TargetFrameworks>net8.0-windows7.0;net8.0</TargetFrameworks>
+   		<RootNamespace>Project_FREAK</RootNamespace>
+    		<Nullable>enable</Nullable>
+    		<ImplicitUsings>enable</ImplicitUsings>
+    		<UseWPF>true</UseWPF>
+  		<EnableWindowsTargeting>true</EnableWindowsTargeting>
     		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-  		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
-
-
+    		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
 	</PropertyGroup>
 
 	<ItemGroup>
