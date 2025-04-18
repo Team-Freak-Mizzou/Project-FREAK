@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- plain net8.0 so it runs on Linux/macOS CI -->
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
