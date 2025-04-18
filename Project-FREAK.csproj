@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<RootNamespace>Project_FREAK</RootNamespace>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
