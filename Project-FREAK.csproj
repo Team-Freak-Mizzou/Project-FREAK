@@ -1,19 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <!-- multi‑target so CI/test can consume a plain net8.0 build -->
+    <!-- Build both a Windows WPF app and a plain .NET library -->
     <TargetFrameworks>net8.0-windows7.0;net8.0</TargetFrameworks>
+
+    <!-- WPF only applies to the windows target -->
     <UseWPF>true</UseWPF>
+
+    <!-- Common settings -->
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <!-- make sure anything under Tests\ is never compiled into the app -->
+    <!-- Never include anything in Tests\ when compiling the app -->
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
   </PropertyGroup>
 
+  <!-- This property tells MSBuild “yes, I really meant to target WindowsDesktop” -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net8.0-windows7.0'">
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
   <ItemGroup>
-    <!-- your runtime dependencies only -->
+    <!-- Your runtime package references -->
     <PackageReference Include="OpenCvSharp4"               Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.Extensions"    Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.runtime.win"   Version="4.10.0.20241108" />
@@ -24,14 +32,13 @@
 
   <ItemGroup>
     <Reference Include="LabJack.LJM" />
-
-    <Content Include="Assets\FONTS\*.ttf">
+    <Content   Include="Assets\FONTS\*.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\LIBRARIES\LabJack.LJM.dll">
+    <Content   Include="Assets\LIBRARIES\LabJack.LJM.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Assets\LOGOS\*.png" />
+    <Resource  Include="Assets\LOGOS\*.png" />
   </ItemGroup>
 
 </Project>
