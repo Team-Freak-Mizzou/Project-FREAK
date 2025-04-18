@@ -8,6 +8,11 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+    		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
+
+
 	</PropertyGroup>
 
 	<ItemGroup>
