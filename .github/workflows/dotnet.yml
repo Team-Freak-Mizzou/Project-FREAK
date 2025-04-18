@@ -1,4 +1,3 @@
-# .github/workflows/dotnet.yml
 name: .NET Build & Test
 
 on:
@@ -9,21 +8,21 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest   # use Windows so WPF references resolve
-
+    runs-on: windows-latest     # <--- Must be Windows for WPF bits
+    
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
 
-      - name: Restore
-        run: dotnet restore .
+    - name: Restore all
+      run: dotnet restore "Project-FREAK.sln"
 
-      - name: Build
-        run: dotnet build . --no-restore
+    - name: Build all
+      run: dotnet build   "Project-FREAK.sln" --no-restore --configuration Debug
 
-      - name: Test
-        run: dotnet test  . --no-build --verbosity normal
+    - name: Test all
+      run: dotnet test    "Project-FREAK.sln" --no-build --verbosity normal
