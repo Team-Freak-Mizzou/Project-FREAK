@@ -10,9 +10,6 @@ jobs:
   build:
     runs-on: windows-latest
 
-    defaults:
-      run:
-        working-directory: ./Project-FREAK/Project-FREAK   # <- two levels down
     steps:
       - uses: actions/checkout@v4
 
@@ -21,11 +18,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore Project-FREAK.sln
+      - name: Restore
+        run: dotnet restore ./Project-FREAK/Project-FREAK.sln
 
       - name: Build
-        run: dotnet build Project-FREAK.sln --no-restore
+        run: dotnet build  ./Project-FREAK/Project-FREAK.sln --no-restore
 
       - name: Test
-        run: dotnet test Project-FREAK.sln --no-build --verbosity normal
+        run: dotnet test   ./Project-FREAK/Project-FREAK.sln --no-build --verbosity normal
