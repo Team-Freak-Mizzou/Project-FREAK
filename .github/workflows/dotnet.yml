@@ -1,16 +1,15 @@
+# .github/workflows/dotnet.yml
 name: .NET Build & Test
 
 on:
-  push:        { branches: [ "master", "dev" ] }
-  pull_request:{ branches: [ "master", "dev" ] }
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master", "dev" ]
 
 jobs:
   build:
-    runs-on: windows-latest
-
-    defaults:
-      run:
-        working-directory: ./Project-FREAK
+    runs-on: windows-latest   # use Windows so WPF references resolve
 
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +20,10 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore .
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build . --no-restore
 
       - name: Test
-        run: dotnet test  --no-build --verbosity normal
+        run: dotnet test  . --no-build --verbosity normal
