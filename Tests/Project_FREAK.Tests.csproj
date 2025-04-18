@@ -4,6 +4,7 @@
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
