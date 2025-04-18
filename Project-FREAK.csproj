@@ -1,52 +1,45 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
-		<RootNamespace>Project_FREAK</RootNamespace>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<UseWPF>true</UseWPF>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-    		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-  		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
+  <!-- 1) Default for ALL OSes: only build a plain net8.0 library -->
+  <PropertyGroup>
+    <!-- plain library target so CI”s Linux restore/build succeeds -->
+    <TargetFramework>net8.0</TargetFramework>
 
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
 
-	</PropertyGroup>
+    <!-- never compile your Tests folder into the app -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="Assets\FONTS\nasalization-rg.otf" />
-		<None Remove="Assets\FONTS\Roboto-Regular.ttf" />
-		<None Remove="Assets\LIBRARIES\LabJack.LJM.dll" />
-		<None Remove="Assets\LOGOS\MSP_LOGO_BG.png" />
-		<None Remove="Assets\LOGOS\MSP_LOGO_WG.png" />
-	</ItemGroup>
+  <!-- 2) Only when running on Windows do we layer on the WPF/TFM -->
+  <PropertyGroup Condition="'$(OS)'=='Windows_NT'">
+    <!-- add the windows WPF target (in addition to net8.0) -->
+    <TargetFrameworks>net8.0-windows7.0;net8.0</TargetFrameworks>
 
-	<ItemGroup>
-		<PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
-		<PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
-		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
-		<PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.10.0.20241108" />
-		<PackageReference Include="System.Drawing.Common" Version="9.0.3" />
-		<PackageReference Include="ScottPlot.Wpf" Version="5.0.55" />
-	</ItemGroup>
+    <!-- enable WPF and allow Windows targeting -->
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<Reference Include="LabJack.LJM">
-		</Reference>
+  <!-- 3) Your runtime deps -->
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4"               Version="4.10.0.20241108" />
+    <PackageReference Include="OpenCvSharp4.Extensions"    Version="4.10.0.20241108" />
+    <PackageReference Include="OpenCvSharp4.runtime.win"   Version="4.10.0.20241108" />
+    <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.10.0.20241108" />
+    <PackageReference Include="System.Drawing.Common"      Version="9.0.3" />
+    <PackageReference Include="ScottPlot.Wpf"              Version="5.0.55" />
+  </ItemGroup>
 
-		<Content Include="Assets\FONTS\nasalization-rg.otf">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\FONTS\Roboto-Regular.ttf">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\LIBRARIES\LabJack.LJM.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Resource Include="Assets\LOGOS\MSP_LOGO_BG.png" />
-		<Resource Include="Assets\LOGOS\MSP_LOGO_WG.png" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <Reference Include="LabJack.LJM" />
+    <Content   Include="Assets\FONTS\*.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content   Include="Assets\LIBRARIES\LabJack.LJM.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource  Include="Assets\LOGOS\*.png" />
+  </ItemGroup>
 </Project>

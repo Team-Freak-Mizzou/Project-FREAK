@@ -1,31 +1,29 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <IsPackable>false</IsPackable>
+    <!-- plain net8.0 so it runs on Linux/macOS CI -->
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- xUnit v2.x -->
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3">
+    <!-- xUnit + coverage -->
+    <PackageReference Include="xunit"                        Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio"    Version="2.5.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-
-    <!-- STA support if you need it; otherwise you can omit this -->
-
-
-    <!-- Test SDK + coverage -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
+    <PackageReference Include="Microsoft.NET.Test.Sdk"       Version="17.13.0" />
+    <PackageReference Include="coverlet.collector"           Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <!-- reference your multi‑targeted app; it will pick up the net8.0 build on Linux CI -->
     <ProjectReference Include="..\Project-FREAK.csproj" />
   </ItemGroup>
+
 </Project>
