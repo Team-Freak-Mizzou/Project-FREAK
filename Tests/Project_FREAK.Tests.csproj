@@ -1,29 +1,27 @@
+<!-- Tests/Project_FREAK.Tests.csproj -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- plain net8.0 so it runs on Linux/macOS CI -->
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- windows slice so WPF packages resolve -->
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!-- if you still have pure-net code you want to test cross-platform,
+         you could multi-target here too -->
+    <!-- <TargetFrameworks>net8.0;net8.0-windows7.0</TargetFrameworks> -->
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- xUnit + coverage -->
-    <PackageReference Include="xunit"                        Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio"    Version="2.5.3">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk"       Version="17.13.0" />
-    <PackageReference Include="coverlet.collector"           Version="6.0.4">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <!-- your xUnit + coverage packages -->
+    <PackageReference Include="xunit"                     Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk"    Version="17.13.0" />
+    <PackageReference Include="coverlet.collector"        Version="6.0.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- reference your multi‑targeted app; it will pick up the net8.0 build on Linux CI -->
+    <!-- you still point at the app, which now has a windows build -->
     <ProjectReference Include="..\Project-FREAK.csproj" />
   </ItemGroup>
-
 </Project>
