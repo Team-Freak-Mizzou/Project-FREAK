@@ -10,11 +10,9 @@ jobs:
   build:
     runs-on: windows-latest
 
-    # everything below runs in the Project-FREAK subfolder
     defaults:
       run:
-        working-directory: Project-FREAK
-
+        working-directory: ./Project-FREAK/Project-FREAK   # <- two levels down
     steps:
       - uses: actions/checkout@v4
 
