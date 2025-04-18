@@ -1,3 +1,4 @@
+# .github/workflows/dotnet.yml
 name: .NET Build & Test
 
 on:
@@ -8,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest   # use Windows so WPF references resolve
 
     steps:
       - uses: actions/checkout@v4
@@ -19,10 +20,10 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore ./Project-FREAK/Project-FREAK.sln
+        run: dotnet restore .
 
       - name: Build
-        run: dotnet build  ./Project-FREAK/Project-FREAK.sln --no-restore
+        run: dotnet build . --no-restore
 
       - name: Test
-        run: dotnet test   ./Project-FREAK/Project-FREAK.sln --no-build --verbosity normal
+        run: dotnet test  . --no-build --verbosity normal
